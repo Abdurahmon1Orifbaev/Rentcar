@@ -90,3 +90,17 @@ class BookingSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return booking
+
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        user = self.context["request"].user
+
+        if not user.check_password(attrs["old_password"]):
+            raise serializers.ValidationError({"old_password": "Old password incorrect"})
+
+        return attrs

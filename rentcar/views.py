@@ -13,6 +13,20 @@ from rentcar.models.comments import Comment
 from rentcar.serializer import RegisterSerializer, CategorySerializer, CarSerializer, CommentSerializer, \
     BookingSerializer
 
+class ChangePasswordAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        new_password = serializer.validated_data["new_password"]
+
+        user = request.user
+        user.set_password(new_password)
+        user.save()
+
+        return Response({"message": "Password changed successfully"})
 
 class RegisterView(CreateAPIView):
     queryset = User.objects.all()
@@ -26,6 +40,8 @@ class CategoryModelAPIView(ListCreateAPIView):
 class CategoryDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
 
 
 
