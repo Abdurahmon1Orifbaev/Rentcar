@@ -35,6 +35,18 @@ class CarModelAPIView(ListCreateAPIView):
     serializer_class = CarSerializer
 
 
+
+
+class LogoutAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if hasattr(request.user, 'auth_token'):
+            request.user.auth_token.delete()
+
+        return Response({"message": "Logged out successfully"})
+
+
 class CarDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
@@ -48,6 +60,7 @@ class CarListAPIView(ListAPIView):
     def get_queryset(self):
         queryset = super().get_queryset()
         params = self.request.query_params
+
 
         category_ids = params.getlist("category")
         if len(category_ids) == 1 and "," in category_ids[0]:
@@ -81,7 +94,23 @@ class CarListAPIView(ListAPIView):
 
 
 
+
 class CommentListCreateAPIView(ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Comment.objects.all()
+        return Comment.objects.filter(user=user)
+
+
+class CommentEditAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]

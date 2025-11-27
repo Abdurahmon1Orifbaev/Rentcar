@@ -4,12 +4,13 @@ from .views import (
     RegisterView,
     CategoryModelAPIView,
     CarDetailAPIView, CategoryDetailAPIView, CarListAPIView, CommentListCreateAPIView, PaymentAPIView, BookingAPIView,
-    BookingDetailAPIView,
+    BookingDetailAPIView, CommentEditAPIView,LogoutAPIView
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('comments/', CommentListCreateAPIView.as_view(), name='comments-list-create'),
+    path('comments/<int:pk>/', CommentEditAPIView.as_view(), name='comments-edit'),
     # CATEGORY LIST + CREATE
     path("categories/", CategoryModelAPIView.as_view()),
     path("categories/<int:pk>/", CategoryDetailAPIView.as_view()),
@@ -30,4 +31,5 @@ urlpatterns = [
     path('api/register/', RegisterView.as_view()),
     path('api/login/', TokenObtainPairView.as_view()),
     path('api/token/refresh/', TokenRefreshView.as_view()),
+    path('api/logout/', LogoutAPIView.as_view()),
 ]
